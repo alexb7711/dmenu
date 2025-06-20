@@ -23,7 +23,6 @@
 /* macros */
 #define INTERSECT(x,y,w,h,r)  (MAX(0, MIN((x)+(w),(r).x_org+(r).width)  - MAX((x),(r).x_org)) \
                              * MAX(0, MIN((y)+(h),(r).y_org+(r).height) - MAX((y),(r).y_org)))
-#define LENGTH(X)             (sizeof X / sizeof X[0])
 #define TEXTW(X)              (drw_fontset_getwidth(drw, (X)) + lrpad)
 
 /* enums */
@@ -104,7 +103,7 @@ cleanup(void)
 {
         size_t i;
 
-	XUngrabKey(dpy, AnyKey, AnyModifier, root);
+	XUngrabKeyboard(dpy, CurrentTime);
 	for (i = 0; i < SchemeLast; i++)
 		free(scheme[i]);
 	for (i = 0; items && items[i].text; ++i)
@@ -778,10 +777,9 @@ setup(void)
                             CWOverrideRedirect | CWBackPixel | CWEventMask, &swa);
         XSetClassHint(dpy, win, &ch);
 
-
-        /* input methods */
-        if ((xim = XOpenIM(dpy, NULL, NULL, NULL)) == NULL)
-                die("XOpenIM failed: could not open input device");
+	/* input methods */
+	if ((xim = XOpenIM(dpy, NULL, NULL, NULL)) == NULL)
+		die("XOpenIM failed: could not open input device");
 
         xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
                         XNClientWindow, win, XNFocusWindow, win, NULL);
